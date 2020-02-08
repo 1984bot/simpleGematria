@@ -7,8 +7,8 @@ import time # used for waiting 5 seconds between tweets
 def hasNumbers(phrase):
     return any(char.isdigit() for char in phrase)
 
-# Method for determining gematria
-def getGematria(phrase):
+# Method for determining ordinal gematria
+def getOrdinalGematria(phrase):
     total = 0
     
     # First check to see if the phrase contains any numbers
@@ -20,8 +20,12 @@ def getGematria(phrase):
         for c in stripped_phrase:
             ordinal = ord(c) - 96
             total += ordinal    
-        reply_tweet = "Your ordinal gematria sum: {}".format(total)
+        reply_tweet = "Ordinal gematria: {}".format(total)
         return reply_tweet
+
+# Method for determining full reduction gematria
+#def getFullReductionGematria(phrase):
+
 
 # Method for determining who it was that is requesting a tweet and replying to it with summed_word
 def replyToUsername(tweet_id,summed_word):
@@ -42,7 +46,7 @@ api = tweepy.API(auth)
 
 # Hashtag search, and iterates through the last 20 mentions.
 keyword = '#tm3k'
-my_mentions = api.mentions_timeline(count=50)
+my_mentions = api.mentions_timeline(count=10)
 for tweet in my_mentions:
     try:
         line = str(tweet.text) # Converts each mention status to a string so i can manipulate it
@@ -51,13 +55,16 @@ for tweet in my_mentions:
         
         if keyword in line:
             
-            temp_var = line.replace('@_tm3k #tm3k', '') # Removes the hashtag and @_tm3k from the phrase and replaces with an empty space so I can sum it up with gematria
+            temp_var = line.replace('@__tm3k #tm3k', '') # Removes the hashtag and @_tm3k from the phrase and replaces with an empty space so I can sum it up with gematria
             phrase = temp_var.strip()
             phrase.lower() # Strips extra spaces and makes lowercase
-            summed_word = getGematria(phrase) # Calls gematria sum method and passes the scraped tweet string to be analyzed and stores the result in the variable summed_word
+            summed_word = getOrdinalGematria(phrase) # Calls gematria sum method and passes the scraped tweet string to be analyzed and stores the result in the variable summed_word
             replyToUsername(tweet_id, summed_word) # Calls reply to username method and passes the id of the tweet containing #tm3k and the value of the letters
             print("Sending reply...\n\n")
             time.sleep(2)
     except:
         print(f"THIS TWEET '{phrase}' HAS ALREADY BEEN REPLIED TO, OR CONTAINS INVALID FORMAT.\n\n")
         continue
+
+
+# need to re write the code to reply with multiple forms of gematria, and run every 30 seconds in an infinite loop, and run from second laptop
